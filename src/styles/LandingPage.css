@@ -1,0 +1,25 @@
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #0F4C75;
+  color: var(--text-white);
+}
+
+.footer-nav,
+.footer-disclaim {
+  display: flex;
+  align-items: center;
+}
+
+.footer-nav {
+  font-size: 16px;
+  font-weight: var(--medium);
+}
+
+.footer-disclaim {
+  font-size: 12px;
+  font-weight: var(--medium);
+  text-align: right;
+  max-width: 500px;
+}
