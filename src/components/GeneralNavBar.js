@@ -1,4 +1,4 @@
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 function DefaultNavBar() {
@@ -20,9 +20,29 @@ function DefaultNavBar() {
   );
 }
 
+function ProfileNavBar(props) {
+  let user = props.user;
+  return (
+    <Navbar expand='md' variant='dark'>
+      <Navbar.Brand href='/'>Vibe Check</Navbar.Brand>
+      Hello, {user.firstName}
+      <Nav>
+        <Nav.Link as={Link} to='/profile'>
+          My Profile
+        </Nav.Link>
+        <Nav.Link as={Link} to='/signin' onClick={props.onLogout}>
+          Sign Out
+        </Nav.Link>
+      </Nav>
+    </Navbar>
+  );
+}
+
 function GeneralNavBar(props) {
   let navBar;
-  if (props.page === 'default') {
+  if (props.user) {
+    navBar = <ProfileNavBar user={props.user} onLogout={props.onLogout} />;
+  } else {
     navBar = <DefaultNavBar />;
   }
   return navBar;

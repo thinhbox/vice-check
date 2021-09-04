@@ -1,33 +1,16 @@
 import React from 'react';
 import { Formik } from 'formik';
 import BasicInputField from 'components/BasicInputField';
-import GeneralNavBar from 'components/GeneralNavBar';
 import GeneralFooter from 'components/GeneralFooter';
 import { Form, Button, Col, Row, Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function identifyUser(email, password) {
-  // fetch user database
-  let userMap = new Map(JSON.parse(localStorage.getItem('userMap')));
-  let userData = userMap.get(email);
-  let result = false;
-  if (userData && userData.password === password) {
-    result = true;
-  }
-  console.log(
-    `Identify result: 
-    Username: ${userMap.get(email).email} 
-    Password: ${userData.password}`
-  );
-  return result;
-}
-
 function Login(props) {
-  const savedRememberMe = localStorage.getItem('rememberMe') === 'true';
-  const savedUsername = savedRememberMe ? localStorage.getItem('username') : '';
+  const rememberMe = localStorage.getItem('rememberMe') === 'true';
+  const username = rememberMe ? localStorage.getItem('username') : '';
   const schema = Yup.object().shape({
     username: Yup.string().email('Invalid email address').required('Required'),
     password: Yup.string()
@@ -35,45 +18,51 @@ function Login(props) {
       .max(28, `Must be 8-28 characters`)
       .required('Required'),
   });
+  const history = useHistory();
+  const userMap = props.userMap;
+
+  function identifyUser(email, password) {
+    // fetch user database
+    let userData = userMap.get(email);
+    let result = false;
+    if (userData && userData.password === password) {
+      result = true;
+    }
+    console.log(
+      `Identify result: 
+      Username: ${userMap.get(email).email} 
+      Password: ${userData.password}`
+    );
+    return result;
+  }
 
   return (
     <Formik
       initialValues={{
-        rememberMe: savedRememberMe,
-        username: savedUsername,
+        rememberMe: rememberMe,
+        username: username,
         password: '',
       }}
       validationSchema={schema}
       onSubmit={async (values) => {
         await sleep(1000);
-        localStorage.setItem('rememberMe', values.rememberMe);
-        localStorage.setItem(
-          'username',
-          values.rememberMe ? values.username : ''
-        );
+
         if (identifyUser(values.username, values.password)) {
-          alert('Login Success!');
+          localStorage.setItem('rememberMe', values.rememberMe);
+          localStorage.setItem(
+            'username',
+            values.rememberMe ? values.username : ''
+          );
+          props.onLogin(values.username);
+          history.push('/profile/' + values.username);
         } else {
           alert('Login Failed!');
         }
       }}
     >
-      {({
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        values,
-        touched,
-        isValid,
-        errors,
-        setFieldValue,
-        isSubmitting,
-      }) => (
+      {({ handleSubmit, values, setFieldValue, isSubmitting }) => (
         <Form noValidate onSubmit={handleSubmit}>
           <Container fluid className='vb-form'>
-            <Row>
-              <GeneralNavBar page='default' />
-            </Row>
             <Col md={3} className='mx-auto mt-5'>
               <Row>
                 <legend>

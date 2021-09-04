@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import GeneralNavBar from 'components/GeneralNavBar';
+import { useHistory } from 'react-router-dom';
 import {
   Container,
   Row,
@@ -12,11 +12,9 @@ import {
 } from 'react-bootstrap';
 import { Formik } from 'formik';
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import BasicInputGroup from 'components/BasicInputGroup';
 import UserAvatar from 'images/avatar_mock_up.png';
-
-const userMap = new Map(JSON.parse(localStorage.getItem('userMap')));
 
 const schema = Yup.object().shape({
   firstName: Yup.string()
@@ -34,26 +32,24 @@ const schema = Yup.object().shape({
     .required('Required'),
 });
 
-function FetchUserData(userId) {
-  let userData = userMap.get(userId);
-  if (userData) {
+function Profile(props) {
+  const history = useHistory();
+  const user = FetchUserData(props.userId);
+
+  function FetchUserData(token) {
+    let userData = props.userMap.get(token);
     console.log('Fetched data:');
     console.log(userData);
     return userData;
-  } else {
-    //If not found any data
   }
-}
 
-function Profile(props) {
-  const user = FetchUserData(props.userId);
-  // const user = {
-  //   firstName: 'Thinh',
-  //   lastName: 'Le',
-  //   nickname: 'Colorful_octopus',
-  //   email: 's1234456@rmit.edu.au',
-  //   joined: '17-Sept-2021',
-  // };
+  // If user not exist
+  if (!user) {
+    history.push('/');
+  }
+
+  let allowEdit = user.email === localStorage.getItem('currentUserToken');
+
   return (
     <Formik
       initialValues={{
@@ -66,18 +62,16 @@ function Profile(props) {
       }}
       validationSchema={schema}
       onSubmit={(values) => {
-        alert(JSON.stringify(values, null, 2));
+        Object.assign(user, values);
+        props.onProfileChange(user);
       }}
     >
-      {({ handleSubmit, values, isSubmitting, handleReset }) => (
+      {({ handleSubmit, values, handleReset }) => (
         <Form noValidate onSubmit={handleSubmit}>
           <Container fluid>
             <Row>
-              <GeneralNavBar page='default' />
-            </Row>
-            <Row>
               <Col className=' mt-5 mx-auto' md={6}>
-                <Card className='' bg='blue'>
+                <Card className='' bg='transparent' border='light'>
                   <Card.Body className='mx-5'>
                     <Row className=' mb-3'>
                       <Col>
@@ -101,7 +95,7 @@ function Profile(props) {
                           type='text'
                           label='First Name'
                           value={values.firstName}
-                          editable
+                          editable={allowEdit}
                         />
                         <BasicInputGroup
                           as={Col}
@@ -109,7 +103,7 @@ function Profile(props) {
                           type='text'
                           label='Last Name'
                           value={values.lastName}
-                          editable
+                          editable={allowEdit}
                         />
                       </Row>
                       <BasicInputGroup
@@ -117,7 +111,7 @@ function Profile(props) {
                         type='text'
                         label='Nickname'
                         value={values.nickName}
-                        editable
+                        editable={allowEdit}
                       />
                       <BasicInputGroup
                         name='email'
@@ -130,7 +124,8 @@ function Profile(props) {
                         type='password'
                         label='Password'
                         value={values.password}
-                        editable
+                        editable={allowEdit}
+                        hidden={!allowEdit}
                       />
                     </Col>
                     <div className='d-flex justify-content-end'>
@@ -138,16 +133,20 @@ function Profile(props) {
                         className='w-auto mx-2'
                         variant='outline-light'
                         onClick={handleReset}
+                        disabled={!allowEdit}
+                        hidden={!allowEdit}
                       >
-                        <Fa icon={faTrash} />
+                        <Fa className='mr-2' icon={faTimes} />
                         Cancel
                       </Button>
                       <Button
                         className='w-auto'
                         variant='outline-light'
                         type='submit'
+                        disabled={!allowEdit}
+                        hidden={!allowEdit}
                       >
-                        <Fa icon={faTrash} />
+                        <Fa className='mr-2' icon={faCheck} />
                         Save Changes
                       </Button>
                     </div>

@@ -5,78 +5,11 @@ import { Form, Row, Col, Button, Container, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 import BasicInputField from 'components/BasicInputField';
-import GeneralNavBar from 'components/GeneralNavBar';
 import GeneralFooter from 'components/GeneralFooter';
 
 import 'styles/SignUpPage.css';
 
-const userMap = new Map(JSON.parse(localStorage.getItem('userMap')));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const date = new Date();
-const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-function setNewUser(user) {
-  let result = false;
-  if (userMap.get(user.email)) {
-    alert('Existed username: ' + user.email);
-    console.log('User detail: ');
-    console.log(userMap.get(user.email));
-  } else {
-    //Get joined date as UTC Time
-    user.joined = `${date.getUTCDate()}-${
-      months[date.getUTCMonth()]
-    }-${date.getUTCFullYear()} - UTC Time`;
-    userMap.set(user.email, user);
-    console.log('Just set: ');
-    console.log(userMap.get(user.email));
-    localStorage.setItem('userMap', JSON.stringify([...userMap]));
-    result = true;
-  }
-  return result;
-}
-
-const schema = Yup.object().shape({
-  firstName: Yup.string()
-    .max(15, `Must be 15 characters or less`)
-    .required('Required'),
-  lastName: Yup.string()
-    .max(15, `Must be 15 characters or less`)
-    .required('Required'),
-  nickName: Yup.string()
-    .max(15, `Must be 15 characters or less`)
-    .required('Required'),
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Required')
-    .test('existedEmail', 'Email is already used!', async (email) => {
-      await sleep(500);
-      if (userMap.get(email)) {
-        return false;
-      } else {
-        return true;
-      }
-    }),
-  password: Yup.string()
-    .min(8, `Must be 8-28 characters`)
-    .max(28, `Must be 8-28 characters`)
-    .required('Required'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Password not match')
-    .required('Required'),
-});
 
 function SuccessModal(props) {
   return (
@@ -114,7 +47,39 @@ function SuccessModal(props) {
 }
 
 function SignUpPage(props) {
+  const userMap = props.userMap;
+
+  const schema = Yup.object().shape({
+    firstName: Yup.string()
+      .max(15, `Must be 15 characters or less`)
+      .required('Required'),
+    lastName: Yup.string()
+      .max(15, `Must be 15 characters or less`)
+      .required('Required'),
+    nickName: Yup.string()
+      .max(15, `Must be 15 characters or less`)
+      .required('Required'),
+    email: Yup.string()
+      .email('Invalid email address')
+      .required('Required')
+      .test('existedEmail', 'Email is already used!', async (email) => {
+        await sleep(500);
+        if (userMap.get(email)) {
+          return false;
+        } else {
+          return true;
+        }
+      }),
+    password: Yup.string()
+      .min(8, `Must be 8-28 characters`)
+      .max(28, `Must be 8-28 characters`)
+      .required('Required'),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref('password')], 'Password not match')
+      .required('Required'),
+  });
   let showModal = false;
+
   return (
     <Formik
       initialValues={{
@@ -126,13 +91,10 @@ function SignUpPage(props) {
         confirmPassword: '',
       }}
       validationSchema={schema}
-      onSubmit={
-        // console.log('submitted')
-        async (values) => {
-          await sleep(1000);
-          showModal = setNewUser(values);
-        }
-      }
+      onSubmit={async (values) => {
+        await sleep(1000);
+        showModal = props.onSignup(values);
+      }}
     >
       {({
         handleSubmit,
@@ -147,9 +109,6 @@ function SignUpPage(props) {
         <Container fluid>
           <SuccessModal show={showModal} email={values.email} />
           <Form className='vb-form mb-5' noValidate onSubmit={handleSubmit}>
-            <Row>
-              <GeneralNavBar page='default' />
-            </Row>
             <Row>
               <Col className='mx-auto mt-5' md={4}>
                 <legend>

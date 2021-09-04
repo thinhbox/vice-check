@@ -116,7 +116,7 @@ a {
   border-bottom: 1px solid whitesmoke;
 }
 
-.btn, .form-control, .input-group-text {
+.btn, .form-control, .input-group-text, .card {
   border-radius: 0;
 }
 
@@ -128,4 +128,8 @@ a {
 /*Extend bootstrap style*/
 .card-img-left{
   
+}
+
+.mr-2 {
+  margin-right: .5rem !important;
 }

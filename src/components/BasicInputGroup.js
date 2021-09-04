@@ -4,12 +4,12 @@ import { useField } from 'formik';
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
-function BasicInputGroup({ label, as, ...props }) {
+function BasicInputGroup({ label, as, hidden, ...props }) {
   const [field, meta] = useField(props);
   const [input, toggleInput] = useState(false);
 
   return (
-    <InputGroup as={as ? as : 'div'}>
+    <InputGroup as={as ? as : 'div'} hidden={hidden ? hidden : ''}>
       <InputGroup.Text bg='blue' className='min-label-width'>
         {label}
       </InputGroup.Text>
