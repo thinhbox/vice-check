@@ -6,19 +6,14 @@ import { Link } from 'react-router-dom';
 
 import BasicInputField from 'components/BasicInputField';
 import GeneralFooter from 'components/GeneralFooter';
-
+import GeneralNavBar from 'components/GeneralNavBar';
 import 'styles/SignUpPage.css';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function SuccessModal(props) {
   return (
-    <Modal
-      show={props.show}
-      onHide={props.handleClose}
-      variant='dark'
-      bg='blue'
-    >
+    <Modal show={props.show} variant='dark'>
       <Modal.Header>
         <Modal.Title as='h4'>Signup Success!</Modal.Title>
       </Modal.Header>
@@ -26,10 +21,10 @@ function SuccessModal(props) {
       <Modal.Body>
         <p>
           Congratulation! Your Vibe Check account have been signed up
-          successfully! An email have been sent to your {props.email}. Please
-          read it for instructions on how to activate your account. You can sign
-          in at Vibe Check after activated your account. We will take you to
-          Sign In page whenever you ready.
+          successfully! An email have been sent to {props.email}. Please read it
+          for instructions on how to activate your account. You can sign in at
+          Vibe Check after activated your account. We will take you to Sign In
+          page whenever you ready.
         </p>
       </Modal.Body>
 
@@ -47,8 +42,7 @@ function SuccessModal(props) {
 }
 
 function SignUpPage(props) {
-  const userMap = props.userMap;
-
+  const passwordRegex = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,})');
   const schema = Yup.object().shape({
     firstName: Yup.string()
       .max(15, `Must be 15 characters or less`)
@@ -63,22 +57,52 @@ function SignUpPage(props) {
       .email('Invalid email address')
       .required('Required')
       .test('existedEmail', 'Email is already used!', async (email) => {
-        await sleep(500);
-        if (userMap.get(email)) {
+        await sleep(50);
+        if (email && localStorage.getItem(email.split('@')[0])) {
           return false;
         } else {
           return true;
         }
       }),
     password: Yup.string()
-      .min(8, `Must be 8-28 characters`)
-      .max(28, `Must be 8-28 characters`)
-      .required('Required'),
+      .required('Required')
+      .matches(
+        passwordRegex,
+        'Must Contain 6 Characters, One Uppercase, One Lowercase, One Number and one special case Character'
+      ),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('password')], 'Password not match')
       .required('Required'),
   });
+  const date = new Date();
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   let showModal = false;
+
+  function handleSignup(user) {
+    user.id = user.email.split('@')[0];
+    user.joined = `${date.getUTCDate()}-${
+      months[date.getUTCMonth()]
+    }-${date.getUTCFullYear()} - UTC Time`;
+    if (localStorage.getItem(user.id)) {
+      return false;
+    } else {
+      localStorage.setItem(user.id, JSON.stringify(user));
+      return true;
+    }
+  }
 
   return (
     <Formik
@@ -91,23 +115,18 @@ function SignUpPage(props) {
         confirmPassword: '',
       }}
       validationSchema={schema}
-      onSubmit={async (values) => {
+      onSubmit={async (user) => {
+        // Extract student id
         await sleep(1000);
-        showModal = props.onSignup(values);
-      }}
-    >
-      {({
-        handleSubmit,
-        handleChange,
-        handleBlur,
-        values,
-        touched,
-        isValid,
-        errors,
-        isSubmitting,
-      }) => (
+
+        showModal = handleSignup(user);
+      }}>
+      {({ handleSubmit, values, isSubmitting }) => (
         <Container fluid>
           <SuccessModal show={showModal} email={values.email} />
+          <Row>
+            <GeneralNavBar />
+          </Row>
           <Form className='vb-form mb-5' noValidate onSubmit={handleSubmit}>
             <Row>
               <Col className='mx-auto mt-5' md={4}>
@@ -175,8 +194,7 @@ function SignUpPage(props) {
                   variant='outline-light'
                   size='lg'
                   type='submit'
-                  disabled={isSubmitting}
-                >
+                  disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Sign Up'}
                 </Button>
               </Col>

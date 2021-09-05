@@ -8,10 +8,11 @@ const BasicTextInput = ({ label, as, ...props }) => {
     <Form.Group
       as={as ? as : 'div'}
       controlId={props.id || props.name}
-      className='text-input-wrapper'
-    >
-      <Form.Label>{label}</Form.Label>
+      className='text-input-wrapper'>
+      {label ? <Form.Label>{label}</Form.Label> : ''}
+      {/* <Form.Label>{label}</Form.Label> */}
       <Form.Control
+        as={props.textarea ? 'textarea' : 'input'}
         {...field}
         {...props}
         isInvalid={meta.touched && meta.error}

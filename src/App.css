@@ -69,7 +69,7 @@ a {
 .modal-header {
   background-color: black;
   border-radius: 0;
-  border: 1px solid white
+  border: 1px solid white;
 }
 
 .modal-body {
@@ -86,11 +86,16 @@ a {
 }
 
 .vb-form .text-input-wrapper {
-  height: 100px;
+  min-height: 100px;
 }
 
 .user-avatar {
   max-width: 100px;
+}
+
+.user-avatar-blog {
+  width: 40px;
+  margin-right: 1rem;
 }
 
 /*Overdrive bootstrap style */
@@ -106,8 +111,9 @@ a {
   border: 1px solid var(--bg-blue);
 }
 
-.form-control:disabled, .form-control[readonly] {
-  background-color: rgba(27, 38, 44, 0.5) ;
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: rgba(27, 38, 44, 0.5);
   border: 1px solid rgba(27, 38, 44, 1);
   color: var(--text-white);
 }
@@ -116,20 +122,28 @@ a {
   border-bottom: 1px solid whitesmoke;
 }
 
-.btn, .form-control, .input-group-text, .card {
+.btn,
+.form-control,
+.input-group-text,
+.card {
   border-radius: 0;
 }
 
-.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link:hover {
+.navbar-dark .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link:hover {
   color: var(--rmit-red);
   font-weight: bold;
 }
 
 /*Extend bootstrap style*/
-.card-img-left{
-  
+.card-img-left {
 }
 
 .mr-2 {
-  margin-right: .5rem !important;
+  margin-right: 0.5rem !important;
+}
+
+.post {
+  background-color: transparent;
+  border-bottom: 1px solid white;
 }

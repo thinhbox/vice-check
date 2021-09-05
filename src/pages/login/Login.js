@@ -5,6 +5,7 @@ import GeneralFooter from 'components/GeneralFooter';
 import { Form, Button, Col, Row, Container } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
+import GeneralNavBar from 'components/GeneralNavBar';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -19,21 +20,16 @@ function Login(props) {
       .required('Required'),
   });
   const history = useHistory();
-  const userMap = props.userMap;
 
   function identifyUser(email, password) {
-    // fetch user database
-    let userData = userMap.get(email);
-    let result = false;
-    if (userData && userData.password === password) {
-      result = true;
+    let userId = email.split('@')[0];
+    let user = JSON.parse(localStorage.getItem(userId));
+    console.log('Get User');
+    console.log(user);
+    if (user && user.password === password) {
+      return true;
     }
-    console.log(
-      `Identify result: 
-      Username: ${userMap.get(email).email} 
-      Password: ${userData.password}`
-    );
-    return result;
+    return false;
   }
 
   return (
@@ -45,7 +41,7 @@ function Login(props) {
       }}
       validationSchema={schema}
       onSubmit={async (values) => {
-        await sleep(1000);
+        await sleep(500);
 
         if (identifyUser(values.username, values.password)) {
           localStorage.setItem('rememberMe', values.rememberMe);
@@ -53,15 +49,19 @@ function Login(props) {
             'username',
             values.rememberMe ? values.username : ''
           );
-          props.onLogin(values.username);
-          history.push('/profile/' + values.username);
+          let userId = values.username.split('@')[0];
+          localStorage.setItem('userToken', userId);
+          // props.onLogin(true);
+          history.push('/profile/' + userId);
         } else {
           alert('Login Failed!');
         }
-      }}
-    >
+      }}>
       {({ handleSubmit, values, setFieldValue, isSubmitting }) => (
         <Form noValidate onSubmit={handleSubmit}>
+          <Row>
+            <GeneralNavBar />
+          </Row>
           <Container fluid className='vb-form'>
             <Col md={3} className='mx-auto mt-5'>
               <Row>
@@ -99,8 +99,7 @@ function Login(props) {
                       checked={values.rememberMe}
                       onChange={(e) => {
                         setFieldValue('rememberMe', e.target.checked, false);
-                      }}
-                    ></Form.Check>
+                      }}></Form.Check>
                   </Form.Group>
                 </Col>
               </Row>
@@ -110,8 +109,7 @@ function Login(props) {
                 variant='outline-light'
                 size='lg'
                 type='submit'
-                disabled={isSubmitting}
-              >
+                disabled={isSubmitting}>
                 {isSubmitting ? 'Loging In...' : 'Login'}
               </Button>
               <p className='mt-2'>
@@ -121,8 +119,8 @@ function Login(props) {
                 </Link>
               </p>
             </Col>
-            <GeneralFooter />
           </Container>
+          <GeneralFooter />
         </Form>
       )}
     </Formik>
