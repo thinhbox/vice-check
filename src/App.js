@@ -15,6 +15,8 @@ import Login from 'pages/login/Login';
 import SignUp from 'pages/welcome/SignUpPage';
 import Profile from 'pages/profile/Profile';
 import Blog from 'pages/blog/Blog';
+import GeneralNavBar from 'components/GeneralNavBar';
+import GeneralFooter from 'components/GeneralFooter';
 
 function App() {
   function isNotLoggedIn(action) {
@@ -33,9 +35,14 @@ function App() {
     return <Profile userId={id} />;
   }
 
+  const [userToken, setToken] = useState('');
+
   return (
-    <Container className='App' fluid>
-      <Router forceRefresh={true}>
+    <Router forceRefresh={true}>
+      <Container className='App' fluid>
+        <Row>
+          <GeneralNavBar />
+        </Row>
         <Row>
           <Switch>
             <Route path='/blog'>
@@ -54,8 +61,9 @@ function App() {
             </Route>
           </Switch>
         </Row>
-      </Router>
-    </Container>
+        <GeneralFooter />
+      </Container>
+    </Router>
   );
 }
 
