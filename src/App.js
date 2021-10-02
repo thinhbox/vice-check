@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Row, Container } from 'react-bootstrap';
+// import { useState } from 'react';
+import { Row } from 'react-bootstrap';
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,21 +9,22 @@ import {
 } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import './App.css';
-import LandingPage from 'pages/welcome/LandingPage';
-import Login from 'pages/login/Login';
-import SignUp from 'pages/welcome/SignUpPage';
-import Profile from 'pages/profile/Profile';
-import Blog from 'pages/blog/Blog';
-import GeneralNavBar from 'components/GeneralNavBar';
-import GeneralFooter from 'components/GeneralFooter';
+// *import './App.css';
+import StyledAppContainer from 'components/styles/AppContainer.styled';
+import LandingPage from 'components/welcome/LandingPage';
+import Login from 'components/login/Login';
+import SignUpPage from 'components/signup/SignUpPage';
+import Profile from 'components/profile/Profile';
+import Blog from 'components/blog/Blog';
+import Header from 'components/Header';
+import Footer from 'components/Footer';
 
 function App() {
   function isNotLoggedIn(action) {
     let result;
-    let token = localStorage.getItem('userToken');
+    const token = localStorage.getItem('userToken');
     if (token) {
-      result = <Redirect to={'/profile/' + token} />;
+      result = <Redirect to={`/profile/${token}`} />;
     } else {
       result = action;
     }
@@ -35,14 +36,10 @@ function App() {
     return <Profile userId={id} />;
   }
 
-  const [userToken, setToken] = useState('');
-
   return (
-    <Router forceRefresh={true}>
-      <Container className='App' fluid>
-        <Row>
-          <GeneralNavBar />
-        </Row>
+    <Router forceRefresh={false}>
+      <StyledAppContainer className='App' fluid>
+        <Header />
         <Row>
           <Switch>
             <Route path='/blog'>
@@ -55,14 +52,14 @@ function App() {
               {isNotLoggedIn(<Redirect to='/login' />)}
             </Route>
             <Route path='/login'>{isNotLoggedIn(<Login />)}</Route>
-            <Route path='/signup'>{isNotLoggedIn(<SignUp />)}</Route>
+            <Route path='/signup'>{isNotLoggedIn(<SignUpPage />)}</Route>
             <Route path='/'>
               {isNotLoggedIn(<LandingPage content='welcome-message' />)}
             </Route>
           </Switch>
         </Row>
-        <GeneralFooter />
-      </Container>
+        <Footer />
+      </StyledAppContainer>
     </Router>
   );
 }

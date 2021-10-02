@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function DefaultNavBar() {
   return (
@@ -18,9 +17,9 @@ function DefaultNavBar() {
   );
 }
 
-function ProfileNavBar(props) {
+function ProfileNavBar() {
   return (
-    <Fragment>
+    <>
       <Nav>
         <Nav.Link as={Link} to='/profile'>
           My Profile
@@ -28,23 +27,18 @@ function ProfileNavBar(props) {
         <Nav.Link as={Link} to='/blog'>
           My Blog
         </Nav.Link>
-        <Nav.Link onClick={props.onLogout}>Sign Out</Nav.Link>
+        <Nav.Link onClick={null}>Sign Out</Nav.Link>
       </Nav>
-    </Fragment>
+    </>
   );
 }
 
-function GeneralNavBar(props) {
+function GeneralNavBar() {
   const token = localStorage.getItem('userToken');
   const user = JSON.parse(localStorage.getItem(token));
-  const history = useHistory();
-  function handleLogout() {
-    localStorage.removeItem('userToken');
-    history.push('/');
-  }
   let navBar;
   if (user) {
-    navBar = <ProfileNavBar user={user} onLogout={handleLogout} />;
+    navBar = <ProfileNavBar user={user} />;
   } else {
     navBar = <DefaultNavBar />;
   }

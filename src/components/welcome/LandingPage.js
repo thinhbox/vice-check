@@ -1,13 +1,10 @@
-import React from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
+import StyledFormButton from 'components/styles/Button.styled';
 import { Link } from 'react-router-dom';
-import 'styles/LandingPage.css';
 
-
-function LandingPage(props) {
+function LandingPage() {
   return (
-    <Container fluid>
-      <Row></Row>
+    <>
       <Row className='landing-page'>
         <Col className='landing-page-content'>
           <Col
@@ -15,22 +12,18 @@ function LandingPage(props) {
             md={4}
           >
             <h1 className='large-text text-center'>
-              Welcome to Vice Check RMIT's Underground Social Network
+              Welcome to Vice Check RMIT`&apos;`s Underground Social Network
             </h1>
             <div>
               <h5>Want To Join Us ʕ•́ᴥ•̀ʔっ ?</h5>
               <Link to='/signup' className='d-grid gap-2'>
-                <Button variant='outline-light' size='lg'>
-                  Register now
-                </Button>
+                <StyledFormButton>Register now</StyledFormButton>
               </Link>
             </div>
             <div>
               <h5>Already registered?</h5>
               <Link to='/login' className='d-grid gap-2'>
-                <Button variant='outline-light' size='lg'>
-                  Login with RMIT email
-                </Button>
+                <StyledFormButton>Login with RMIT email</StyledFormButton>
               </Link>
             </div>
             <h6>
@@ -42,7 +35,7 @@ function LandingPage(props) {
           </Col>
         </Col>
       </Row>
-    </Container>
+    </>
   );
 }
 

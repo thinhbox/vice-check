@@ -1,3 +1,6 @@
+/* eslint-disable */
+/* !Careful, ESLINT disabled*/
+
 import React, { useState } from 'react';
 import { InputGroup, Form, Button } from 'react-bootstrap';
 import { useField } from 'formik';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import {
@@ -11,11 +11,10 @@ import {
   Form,
   ListGroup,
 } from 'react-bootstrap';
-import GeneralNavBar from 'components/GeneralNavBar';
 import BasicInputField from 'components/BasicInputField';
 import UserAvatar from 'images/avatar_mock_up.png';
 
-export default function Blog(props) {
+export default function Blog() {
   const schema = Yup.object().shape({
     postContent: Yup.string()
       .min(15, 'Must be at least 15 characters')
@@ -30,6 +29,7 @@ export default function Blog(props) {
   const [postMap, setPostMap] = useState(user.postMap);
   const [postList, setPostList] = useState(
     postMap.map((post, index) => (
+      // eslint-disable-next-line react/no-array-index-key
       <ListGroup.Item key={index} variant='dark' className='post'>
         <h6>Post #{index}</h6>
         <p>{post}</p>
@@ -48,6 +48,7 @@ export default function Blog(props) {
         localStorage.setItem(user.id, JSON.stringify(user));
         setPostList(
           postMap.map((post, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <ListGroup.Item key={index} variant='dark' className='post'>
               <h6>Post #{index}</h6>
               <p>{post}</p>
@@ -55,13 +56,11 @@ export default function Blog(props) {
           ))
         );
         console.log(postMap[postMap.length - 1]);
-      }}>
+      }}
+    >
       {({ handleSubmit }) => (
         <Form className='mb-3' noValidate onSubmit={handleSubmit}>
           <Container fluid>
-            <Row>
-              <GeneralNavBar />
-            </Row>
             <Row>
               <Col className='mx-auto mt-5' md={8}>
                 <Card border='light' bg='transparent'>
@@ -86,7 +85,8 @@ export default function Blog(props) {
                     <Button
                       className='mt-3'
                       type='submit'
-                      variant='outline-light'>
+                      variant='outline-light'
+                    >
                       Post
                     </Button>
                   </Card.Body>

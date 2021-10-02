@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import * as Yup from 'yup';
 import { useHistory } from 'react-router-dom';
 import {
@@ -9,6 +9,7 @@ import {
   Card,
   Form,
   Image,
+  Modal,
 } from 'react-bootstrap';
 import { Formik } from 'formik';
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
@@ -17,10 +18,8 @@ import {
   faCheck,
   faUserSlash,
 } from '@fortawesome/free-solid-svg-icons';
-import { Modal } from 'react-bootstrap';
 import BasicInputGroup from 'components/BasicInputGroup';
 import UserAvatar from 'images/avatar_mock_up.png';
-import GeneralNavBar from 'components/GeneralNavBar';
 
 const schema = Yup.object().shape({
   firstName: Yup.string()
@@ -40,23 +39,28 @@ const schema = Yup.object().shape({
 
 function Profile(props) {
   const history = useHistory();
-  const user = FetchUserData(props.userId);
-
+  // eslint-disable-next-line no-unused-vars
   function FetchUserData(token) {
-    let userData = JSON.parse(localStorage.getItem(token));
+    const userData = JSON.parse(localStorage.getItem(token));
     console.log('Fetched data:');
     console.log(userData);
     return userData;
   }
+
+  const user = null;
 
   // If user not exist
   if (!user) {
     history.push('/');
   }
 
-  let allowEdit = props.userId === localStorage.getItem('userToken');
 
+  // eslint-disable-next-line react/prop-types
+  const allowEdit = false;
+
+  // eslint-disable-next-line no-unused-vars
   function handleDelete() {
+    // eslint-disable-next-line react/prop-types
     localStorage.removeItem(props.userId);
     localStorage.removeItem('userToken');
     history.push('/');
@@ -77,7 +81,8 @@ function Profile(props) {
       onSubmit={(values) => {
         Object.assign(user, values);
         localStorage.setItem(user.id, JSON.stringify(user));
-      }}>
+      }}
+    >
       {({ handleSubmit, values, handleReset }) => (
         <Form noValidate onSubmit={handleSubmit}>
           <Modal show={showModal} variant='dark'>
@@ -97,18 +102,18 @@ function Profile(props) {
                 variant='light'
                 onClick={() => {
                   setModal(false);
-                }}>
+                }}
+              >
                 Cancel
               </Button>
 
-              <Button variant='outline-danger' onClick={handleDelete}>
+
+              <Button variant='outline-danger' onClick={null}>
                 Proceed to Removal
               </Button>
             </Modal.Footer>
           </Modal>
-          <Row>
-            <GeneralNavBar />
-          </Row>
+
           <Container fluid>
             <Row>
               <Col className=' mt-5 mx-auto' md={6}>
@@ -178,7 +183,8 @@ function Profile(props) {
                             setModal(true);
                           }}
                           disabled={!allowEdit}
-                          hidden={!allowEdit}>
+                          hidden={!allowEdit}
+                        >
                           <Fa className='mr-2' icon={faUserSlash} />
                           Delete Profile
                         </Button>
@@ -189,7 +195,8 @@ function Profile(props) {
                           variant='outline-light'
                           onClick={handleReset}
                           disabled={!allowEdit}
-                          hidden={!allowEdit}>
+                          hidden={!allowEdit}
+                        >
                           <Fa className='mr-2' icon={faTimes} />
                           Cancel
                         </Button>
@@ -198,7 +205,8 @@ function Profile(props) {
                           variant='outline-light'
                           type='submit'
                           disabled={!allowEdit}
-                          hidden={!allowEdit}>
+                          hidden={!allowEdit}
+                        >
                           <Fa className='mr-2' icon={faCheck} />
                           Save Changes
                         </Button>

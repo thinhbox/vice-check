@@ -23,3 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 src/images/philippe-bout-93W0xn4961g-unsplash.jpg
 A1-ThinhQuocLe-s3752794.zip
+.eslintrc.old.js
+
+.eslintrc.js
