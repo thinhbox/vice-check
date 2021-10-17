@@ -1,5 +1,5 @@
 import { Row, Col } from 'react-bootstrap';
-import StyledFormButton from 'components/styles/Button.styled';
+import { StyledFormButton } from 'components/styles/Button.styled';
 import { Link } from 'react-router-dom';
 
 function LandingPage() {

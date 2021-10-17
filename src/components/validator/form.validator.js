@@ -9,6 +9,10 @@ const passwordRegex = new RegExp(
   '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,})'
 );
 
+const optionalPasswordRegex = new RegExp(
+  `(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,})|`
+);
+
 const firstName = {
   firstName: yup
     .string()
@@ -44,6 +48,16 @@ const password = {
     ),
 };
 
+const optionalPassword = {
+  password: yup
+    .string()
+    .ensure()
+    .matches(
+      optionalPasswordRegex,
+      'Must Contain 6 Characters, One Uppercase, One Lowercase, One Number and one special case Character'
+    ),
+};
+
 const confirmPassword = {
   confirmPassword: yup
     .string()
@@ -62,3 +76,10 @@ export const signupSchema = yup.object().shape({
 
 // Only valid selected field for login
 export const loginSchema = signupSchema.pick(['email', 'password']);
+
+export const updateProfileSchema = yup.object().shape({
+  ...firstName,
+  ...lastName,
+  ...nickName,
+  ...optionalPassword,
+});

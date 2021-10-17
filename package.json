@@ -20,6 +20,7 @@
     "react-hook-form": "^7.16.1",
     "react-router-dom": "^5.2.1",
     "react-scripts": "4.0.3",
+    "sha3": "^2.1.4",
     "styled-components": "^5.3.1",
     "web-vitals": "^1.1.2",
     "yup": "^0.32.9"

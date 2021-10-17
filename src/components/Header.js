@@ -1,7 +1,9 @@
-import GeneralNavBar from "./GeneralNavBar";
+import GeneralNavBar from './GeneralNavBar';
 
 export default function Header() {
-    return (
-        <GeneralNavBar/>
-    )
+  return (
+    <>
+      <GeneralNavBar />
+    </>
+  );
 }

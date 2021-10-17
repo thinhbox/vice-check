@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const FormInputField = ({ id, label, register, errors, as, ...rest }) => (
-  <StyledFormInputField as={as || 'div'} controlId={id}>
+  <StyledFormInputField as={as}>
     {label ? <Form.Label>{label}</Form.Label> : ''}
     <Form.Control {...register(id)} {...rest} isInvalid={!!errors[id]} />
     {errors[id] ? (
@@ -25,8 +25,8 @@ FormInputField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   register: PropTypes.func.isRequired,
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  as: PropTypes.string,
+  errors: PropTypes.objectOf(PropTypes.object).isRequired,
+  as: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };
 
 export default FormInputField;

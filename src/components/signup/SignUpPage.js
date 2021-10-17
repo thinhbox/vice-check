@@ -1,32 +1,47 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Form, Row, Col, Button, Container, Modal } from 'react-bootstrap';
+import { Form, Row, Col, Container, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
 import FormInputField from 'components/BasicInputField';
-import StyledFormButton from 'components/styles/Button.styled';
+import {
+  StyledFormButton,
+  StyledButton,
+} from 'components/styles/Button.styled';
 import { signupSchema } from 'components/validator/form.validator';
 import { SignUpService } from 'services/user.service';
+import { useState } from 'react';
+import styled from 'styled-components';
 
 function SignUpPage() {
-  const showModal = false;
-  const isSubmitting = false;
+  const [showModal, setShowModal] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm({
     resolver: yupResolver(signupSchema),
   });
-  const onSubmit = (data) => {
-    console.log(data);
-    SignUpService(data);
+  const onSubmit = async (data) => {
+    setSubmitting(true);
+    console.log('Submit data: ', data);
+    SignUpService(data).then((result) => {
+      if (result) {
+        setShowModal(true);
+        setEmail(getValues('email'));
+      } else {
+        setSubmitting(false);
+      }
+    });
   };
 
   return (
     <Container fluid>
-      <SuccessModal show={showModal} email={showModal} />
+      <SuccessModal show={showModal} email={email} />
       <Form
         className='vb-form mb-5'
         noValidate
@@ -37,7 +52,7 @@ function SignUpPage() {
             <legend>
               <h1>Register your Vibe Check account</h1>
               <h5>
-                We need some basic informations to identify you when you
+                We need some basic information to identify you when you
                 comeback.
               </h5>
             </legend>
@@ -103,7 +118,7 @@ function SignUpPage() {
             <h6 className='small-text mb-3'>
               We dedicated this site for only RMIT’s students & alumni. Our goal
               is to create a friendly and cool spaces for everyone so we have
-              our community guidelines. By registering, logining or using this
+              our community guidelines. By registering, logging or using this
               network, you are accepted our community guidelines.
             </h6>
 
@@ -120,7 +135,7 @@ function SignUpPage() {
 export default SignUpPage;
 
 const SuccessModal = ({ show, email }) => (
-  <Modal show={show} variant='dark'>
+  <StyledModal show={show} variant='dark' centered>
     <Modal.Header>
       <Modal.Title as='h4'>Signup Success!</Modal.Title>
     </Modal.Header>
@@ -128,26 +143,68 @@ const SuccessModal = ({ show, email }) => (
     <Modal.Body>
       <p>
         Congratulation! Your Vibe Check account have been signed up
-        successfully! An email have been sent to {email}. Please read it for
-        instructions on how to activate your account. You can sign in at Vibe
-        Check after activated your account. We will take you to Sign In page
-        whenever you ready.
+        successfully! An email with instructions on how to activate your account have
+        been sent to:
       </p>
+      <blockquote>
+        <strong>{email}</strong>
+      </blockquote>
     </Modal.Body>
 
     <Modal.Footer>
       <Link to='/'>
-        <Button variant='outline-secondary'>Resend Email</Button>
+        <StyledButton variant='outline-secondary'>Resend Email</StyledButton>
       </Link>
-
       <Link to='/login'>
-        <Button variant='outline-light'>I`&apos;`m Ready</Button>
+        <StyledButton variant='outline-light'>Take me to Login</StyledButton>
       </Link>
     </Modal.Footer>
-  </Modal>
+  </StyledModal>
 );
 
 SuccessModal.propTypes = {
   show: PropTypes.bool.isRequired,
   email: PropTypes.string.isRequired,
 };
+
+const StyledModal = styled(Modal)`
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  label,
+  strong {
+    color: white;
+  }
+
+  blockquote {
+    text-align: center;
+    margin: 0 !important;
+  }
+
+  .modal-content {
+    border-radius: 0;
+  }
+
+  .modal-header {
+    background-color: black;
+    border-radius: 0;
+    border: 1px solid white;
+  }
+
+  .modal-body {
+    background-color: black;
+    border: 1px solid white;
+    border-bottom: none;
+  }
+
+  .modal-footer {
+    background-color: black;
+    border-radius: 0;
+    border: 1px solid white;
+    border-top: 0px;
+  }
+`;
