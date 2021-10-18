@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { InputGroup, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faEdit } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
 
-function BasicInputGroup({
+export function FormInputGroup({
   id,
   label,
   register,
@@ -46,4 +47,42 @@ function BasicInputGroup({
   );
 }
 
-export default BasicInputGroup;
+export function FormInputComment({
+  id,
+  label,
+  register,
+  errors,
+  as,
+  hidden,
+  editable,
+  ...rest
+}) {
+  return (
+    <StyledInputGroup as={as} hidden={hidden}>
+      {label && (
+        <InputGroup.Text bg='blue' className='min-label-width'>
+          {label || ''}
+        </InputGroup.Text>
+      )}
+
+      <Form.Control {...register(id)} {...rest} isInvalid={!!errors[id]} />
+
+      <Button className='btn-input-group' variant='outline-light' type='submit'>
+        <Fa icon={faPaperPlane} />
+      </Button>
+
+      <Form.Control.Feedback type='invalid' className='error-message'>
+        {errors[id]?.message}
+      </Form.Control.Feedback>
+    </StyledInputGroup>
+  );
+}
+
+const StyledInputGroup = styled(InputGroup)`
+  background-color: black;
+
+  .form-control {
+    color: white;
+    background-color: black;
+  }
+`;

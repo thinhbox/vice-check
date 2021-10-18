@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
-import FormInputField from 'components/BasicInputField';
+import { FormInputField } from 'components/BasicInputField';
 import {
   StyledFormButton,
   StyledButton,
@@ -18,6 +18,7 @@ function SignUpPage() {
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
+  const [isServerError, setServerError] = useState(false);
   const {
     register,
     handleSubmit,
@@ -34,7 +35,9 @@ function SignUpPage() {
         setShowModal(true);
         setEmail(getValues('email'));
       } else {
+        console.log('FAIL TO REGISTER');
         setSubmitting(false);
+        setServerError(true);
       }
     });
   };
@@ -121,6 +124,11 @@ function SignUpPage() {
               our community guidelines. By registering, logging or using this
               network, you are accepted our community guidelines.
             </h6>
+            <StyledError>
+              {isServerError
+                ? 'Problem occurred! Please check your internet connection or Try again later...'
+                : ''}
+            </StyledError>
 
             <StyledFormButton type='submit' disabled={isSubmitting}>
               {isSubmitting ? 'Submitting...' : 'Sign Up'}
@@ -143,8 +151,8 @@ const SuccessModal = ({ show, email }) => (
     <Modal.Body>
       <p>
         Congratulation! Your Vibe Check account have been signed up
-        successfully! An email with instructions on how to activate your account have
-        been sent to:
+        successfully! An email with instructions on how to activate your account
+        have been sent to:
       </p>
       <blockquote>
         <strong>{email}</strong>
@@ -207,4 +215,9 @@ const StyledModal = styled(Modal)`
     border: 1px solid white;
     border-top: 0px;
   }
+`;
+
+const StyledError = styled.p`
+  color: red;
+  background-color: red;
 `;

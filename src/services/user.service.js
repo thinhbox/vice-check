@@ -58,6 +58,7 @@ export const SignUpService = async (data) => {
     .catch((err) => {
       console.log('Error occured!');
       console.log(err);
+      return false;
     });
   return result;
 };

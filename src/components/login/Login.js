@@ -1,4 +1,4 @@
-import FormInputField from 'components/BasicInputField';
+import { FormInputField } from 'components/BasicInputField';
 import { Form, Col, Row, Container } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,12 +27,12 @@ function Login() {
     formState: { errors },
     setValue,
     getValues,
+    setError,
   } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
   const onSubmit = (data) => {
-    console.log('🚀 ~ file: Login.js ~ line 34 ~ onSubmit ~ data', data);
     setSubmitting(true);
 
     localStorage.setItem(keyword.rememberMe, getValues(keyword.rememberMe));
@@ -48,6 +48,16 @@ function Login() {
         localStorage.setItem('token', result.userToken);
         history.replace(`/profile/${getValues(keyword.email)}`);
       } else {
+        setError(
+          keyword.email,
+          { message: 'Wrong username or password' },
+          { shouldFocus: false }
+        );
+        setError(
+          keyword.password,
+          { message: 'Wrong username or password' },
+          { shouldFocus: false }
+        );
         setSubmitting(false);
       }
     });
@@ -68,7 +78,7 @@ function Login() {
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Container fluid className='vb-form'>
-        <Col md={3} className='mx-auto mt-5'>
+        <Col md={4} className='mx-auto mt-5'>
           <Row>
             <legend>
               <h1>Login</h1>

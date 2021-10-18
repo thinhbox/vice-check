@@ -1,102 +1,143 @@
-import { useState } from 'react';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
+/* eslint-disable no-unused-vars */
+import { useState, useContext, useLayoutEffect, useEffect } from 'react';
 import {
   Container,
   Row,
   Col,
   Button,
   Card,
-  Image,
+  // Image,
   Form,
   ListGroup,
 } from 'react-bootstrap';
-import BasicInputField from 'components/BasicInputField';
-import UserAvatar from 'images/avatar_mock_up.png';
+import styled from 'styled-components';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
+import { UserContext } from 'App';
+// import UserAvatar from 'images/avatar_mock_up.png';
+import { FormInputArea } from 'components/BasicInputField';
+import { postContentSchema } from 'components/validator/post.validator';
+import { FetchBlogPost, Posting } from 'services/blog.service';
+import Post from 'components/Post';
 
-export default function Blog() {
-  const schema = Yup.object().shape({
-    postContent: Yup.string()
-      .min(15, 'Must be at least 15 characters')
-      .required('Must be at least 15 characters'),
+// eslint-disable-next-line react/prop-types
+export default function Blog({ userId }) {
+  const { user, token } = useContext(UserContext);
+  const [postData, setPostData] = useState();
+  const [postList, setPostList] = useState();
+  const allowPosting = userId === user?.email;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm({
+    resolver: yupResolver(postContentSchema),
   });
-  const user = JSON.parse(
-    localStorage.getItem(localStorage.getItem('userToken'))
-  );
-  if (user.postMap === undefined || null || false) {
-    user.postMap = [];
-  }
-  const [postMap, setPostMap] = useState(user.postMap);
-  const [postList, setPostList] = useState(
-    postMap.map((post, index) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <ListGroup.Item key={index} variant='dark' className='post'>
-        <h6>Post #{index}</h6>
-        <p>{post}</p>
-      </ListGroup.Item>
-    ))
-  );
+
+  const onSubmit = (data) => {
+    Posting(token, data)
+      .then((newPost) => {
+        if (postData) {
+          const postArr = postData.posts;
+          postArr.push(newPost);
+          const newPostData = {
+            owner: { nickName: postData.owner.nickName },
+            posts: postArr,
+          };
+          setPostData(newPostData);
+        } else {
+          FetchBlogPost(userId, token).then((posts) => {
+            setPostData(posts);
+          });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(
+          'postContent',
+          { message: `Can't post right now! Try again later.` },
+          { shouldFocus: false }
+        );
+      });
+  };
+
+  useEffect(() => {
+    FetchBlogPost(userId, token)
+      .then((data) => {
+        setPostData(data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
+  useLayoutEffect(() => {
+    console.log('TRIGGER LAYOUT EFFECT');
+    if (user && postData) {
+      const ownerNickname = postData.owner.nickName;
+      const blogPosts = postData.posts.map(({ id, postContent, createdAt }) => (
+        <Post
+          key={id}
+          id={id}
+          ownerNickname={ownerNickname}
+          postContent={postContent}
+          createdAt={createdAt}
+          register={register}
+          errors={errors}
+        />
+      ));
+      setPostList(blogPosts);
+    }
+  }, [postData]);
 
   return (
-    <Formik
-      initialValues={{ postContent: '' }}
-      validationSchema={schema}
-      onSubmit={(values) => {
-        postMap.push(values.postContent);
-        user.postMap = postMap;
-        setPostMap(postMap);
-        localStorage.setItem(user.id, JSON.stringify(user));
-        setPostList(
-          postMap.map((post, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <ListGroup.Item key={index} variant='dark' className='post'>
-              <h6>Post #{index}</h6>
-              <p>{post}</p>
-            </ListGroup.Item>
-          ))
-        );
-        console.log(postMap[postMap.length - 1]);
-      }}
-    >
-      {({ handleSubmit }) => (
-        <Form className='mb-3' noValidate onSubmit={handleSubmit}>
-          <Container fluid>
-            <Row>
-              <Col className='mx-auto mt-5' md={8}>
-                <Card border='light' bg='transparent'>
-                  <Card.Body>
-                    <Card.Title>
-                      <Image
-                        className='user-avatar-blog'
-                        src={UserAvatar}
-                        alt='User avatar'
-                        rounded
-                      />
-                      Hi {user.firstName}, what are you thinking?
-                    </Card.Title>
-
-                    <BasicInputField
-                      name='postContent'
-                      type='text'
-                      textarea='true'
-                      placeholder=''
-                    />
-
-                    <Button
-                      className='mt-3'
-                      type='submit'
-                      variant='outline-light'
-                    >
-                      Post
-                    </Button>
-                  </Card.Body>
-                  <ListGroup variant='flush'>{postList}</ListGroup>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        </Form>
-      )}
-    </Formik>
+    <StyledBlogContainer fluid>
+      <Row>
+        <Col className='mx-auto mt-5' md={8}>
+          {allowPosting && (
+            <Form className='mb-3' noValidate onSubmit={handleSubmit(onSubmit)}>
+              <Card border='light' bg='transparent'>
+                <Card.Body>
+                  <Card.Title>
+                    Hi {user?.firstName}, what are you thinking?
+                  </Card.Title>
+                  <FormInputArea
+                    className='post-content'
+                    id='postContent'
+                    name='postContent'
+                    type='textArea'
+                    textarea='true'
+                    register={register}
+                    errors={errors}
+                  />
+                  <Button type='submit' variant='outline-light'>
+                    Post
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Form>
+          )}
+          <ListGroup variant='flush'>{postList}</ListGroup>
+        </Col>
+      </Row>
+    </StyledBlogContainer>
   );
 }
+
+const StyledBlogContainer = styled(Container)`
+  color: white;
+  * {
+    border-radius: 0;
+  }
+
+  .post-content {
+    min-height: 4rem;
+  }
+
+  // Display post from latest to oldest
+  .list-group {
+    flex-direction: column-reverse;
+  }
+`;

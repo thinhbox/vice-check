@@ -40,11 +40,13 @@ function ProfileNavBar({ user, onSignOut }) {
 
 function GeneralNavBar() {
   const history = useHistory();
-  const { user, setUser } = useContext(UserContext);
+  const { user, refreshUserState, setToken } = useContext(UserContext);
 
   const onSignOut = () => {
     localStorage.removeItem('token');
-    setUser(null);
+    localStorage.removeItem('user');
+    setToken(null);
+    refreshUserState(null);
     history.replace('/');
   };
 

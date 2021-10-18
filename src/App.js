@@ -7,7 +7,6 @@ import {
   Route,
   useParams,
   Redirect,
-  // useHistory
 } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -27,25 +26,29 @@ export const UserContext = React.createContext(null);
 
 export function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
   function isLoggedIn(trueAction, falseAction) {
     return user ? trueAction : falseAction;
   }
 
+  // Fetch user profile if the token exists
   function refreshUserState(state) {
-    if (state || state === null) {
-      setUser(state);
-    } else if (token) {
+    if (token && !user) {
       console.log('Found Token, Start fetching...');
       FetchUserProfileByToken(token)
         .then((data) => {
+          localStorage.setItem('user', JSON.stringify(data));
           setUser(data);
         })
         .catch((err) => {
           localStorage.removeItem('token');
+          setToken(null);
+          setUser(null);
           console.error(err);
         });
+    } else if (state || state === null) {
+      setUser(state);
     }
   }
 
@@ -53,6 +56,13 @@ export function App() {
     const { id } = useParams();
     return <Profile userId={id} />;
   }
+
+  function UserBlog() {
+    const { id } = useParams();
+    return <Blog userId={id} />;
+  }
+
+  // refreshUserState();
 
   useLayoutEffect(() => {
     refreshUserState();
@@ -65,7 +75,14 @@ export function App() {
           <Header />
           <Row>
             <Switch>
+              <Route path='/blog/:id'>
+                {isLoggedIn(<UserBlog />, <Redirect to='/login' />)}
+              </Route>
               <Route path='/blog'>
+                {isLoggedIn(
+                  <Redirect to={`/blog/${user?.email}`} />,
+                  <Redirect to='/login' />
+                )}
                 <Blog />
               </Route>
               <Route path='/profile/:id'>

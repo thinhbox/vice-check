@@ -31,7 +31,8 @@ const nickName = {
   nickName: yup
     .string()
     .max(15, `Must be 15 characters or less`)
-    .required('Required'),
+    .required('Required')
+    .matches(/^[aA-zZ\s]+$/, 'Only allow alphabet characters'),
 };
 
 const email = {

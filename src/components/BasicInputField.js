@@ -2,7 +2,14 @@ import { Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const FormInputField = ({ id, label, register, errors, as, ...rest }) => (
+export const FormInputField = ({
+  id,
+  label,
+  register,
+  errors,
+  as,
+  ...rest
+}) => (
   <StyledFormInputField as={as}>
     {label ? <Form.Label>{label}</Form.Label> : ''}
     <Form.Control {...register(id)} {...rest} isInvalid={!!errors[id]} />
@@ -29,7 +36,39 @@ FormInputField.propTypes = {
   as: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };
 
-export default FormInputField;
+// To use in Blog
+export const FormInputArea = ({ id, label, register, errors, as, ...rest }) => (
+  <StyledFormInputField as={as}>
+    {label && <Form.Label>{label}</Form.Label>}
+    <Form.Control
+      {...register(id)}
+      {...rest}
+      as='textarea'
+      isInvalid={!!errors[id]}
+    />
+    {errors[id] ? (
+      <Form.Control.Feedback type='invalid' className='error-message'>
+        {errors[id].message}
+      </Form.Control.Feedback>
+    ) : (
+      // Act as a placeholder for error message
+      <Form.Control.Feedback className='fake-invis'>.</Form.Control.Feedback>
+    )}
+  </StyledFormInputField>
+);
+
+FormInputArea.defaultProps = {
+  as: 'div',
+  label: null,
+};
+
+FormInputArea.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.objectOf(PropTypes.object).isRequired,
+  as: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+};
 
 const StyledFormInputField = styled(Form.Group)`
   .form-control {
@@ -40,5 +79,9 @@ const StyledFormInputField = styled(Form.Group)`
   .fake-invis {
     display: block;
     opacity: 0;
+  }
+
+  .invalid-feedback {
+    text-align: end;
   }
 `;

@@ -11,7 +11,7 @@ import {
   faCheck,
   faUserSlash,
 } from '@fortawesome/free-solid-svg-icons';
-import FormInputGroup from 'components/BasicInputGroup';
+import { FormInputGroup } from 'components/BasicInputGroup';
 import UserAvatar from 'images/avatar_mock_up.png';
 import {
   DeleteUserProfile,
@@ -36,10 +36,9 @@ function Profile({ userId }) {
   const history = useHistory();
   const { user, refreshUserState, token, setToken } = useContext(UserContext);
 
-  console.log('email+token: ', userId, token);
   // userProfile is different from user state in App.js which is the logged in user
   const [userProfile, setUserProfile] = useState();
-  console.log('Validating Editable: ', userId, user);
+  // Check if the logged in user is the owner of this profile
   let allowEdit = userId === user?.email;
   const [showModal, setModal] = useState(false);
 
@@ -55,7 +54,8 @@ function Profile({ userId }) {
 
   const onSubmit = async (data) => {
     try {
-      console.log('FORM - USER UPDATE: ', data);
+      // console.log('FORM - USER UPDATE: ', data);
+      // Sanitize the data to avoid sending unwanted information.
       const userData = {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -63,7 +63,9 @@ function Profile({ userId }) {
         password: data.password,
       };
       const updatedUser = await UpdateUserProfile(token, userId, userData);
+      // Ask the parent component to fetch new user data
       refreshUserState();
+      // Set current user profile data to the returned data from server
       setUserProfile(updatedUser);
     } catch (error) {
       console.error(error);
@@ -72,15 +74,16 @@ function Profile({ userId }) {
     }
   };
 
+  // Handle form reset
   const handleReset = () => {
     reset();
   };
 
-  // TODO: Contact to DB, delete, return true, delete token, log out
   const handleDelete = async () => {
     // eslint-disable-next-line react/prop-types
     if (await DeleteUserProfile(token, userId)) {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setUserProfile(null);
       setToken(null);
       refreshUserState(null);
@@ -88,15 +91,12 @@ function Profile({ userId }) {
     }
   };
 
-  /*
-   * Known bug: Due to useLayoutEffect in higher comps(App) so the page will call
-   * its useLayoutEffect twice
-   */
   useLayoutEffect(() => {
-    console.log('Profile-Trigger Effect');
     FetchUserProfileByEmail(userId, token)
       .then((data) => {
         setUserProfile(data);
+        // set initial value for form so it can reset value back to default if
+        // needed
         reset({
           firstName: data.firstName,
           lastName: data.lastName,
@@ -123,7 +123,6 @@ function Profile({ userId }) {
         email: userProfile.email,
         password: '',
       });
-      // setUser(userProfile);
     }
   }, [userProfile]);
 
@@ -191,7 +190,7 @@ function Profile({ userId }) {
                       type='text'
                       label='First Name'
                       defaultValue={getValues(keyword.firstName)}
-                      editable={allowEdit.toString()}
+                      editable={allowEdit}
                       register={register}
                       errors={errors}
                     />
@@ -202,7 +201,7 @@ function Profile({ userId }) {
                       type='text'
                       label='Last Name'
                       defaultValue={getValues(keyword.lastName)}
-                      editable={allowEdit.toString()}
+                      editable={allowEdit}
                       register={register}
                       errors={errors}
                     />
@@ -213,7 +212,7 @@ function Profile({ userId }) {
                     type='text'
                     label='Nickname'
                     defaultValue={getValues(keyword.nickName)}
-                    editable={allowEdit.toString()}
+                    editable={allowEdit}
                     register={register}
                     errors={errors}
                   />
@@ -233,7 +232,7 @@ function Profile({ userId }) {
                     label='Password'
                     defaultValue={getValues(keyword.password)}
                     placeholder='*************'
-                    editable={allowEdit.toString()}
+                    editable={allowEdit}
                     hidden={!allowEdit}
                     register={register}
                     errors={errors}
